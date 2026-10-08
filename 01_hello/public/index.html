@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Node.js サーバー</title>
+    <style>
+        :root {
+            --bg: #f4f7f5;
+            --card: #ffffff;
+            --text: #1f2a24;
+            --muted: #5b6b62;
+            --accent: #3c873a; /* Node.js グリーン */
+            --border: #e2e8e4;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #121614;
+                --card: #1b211e;
+                --text: #e6ece8;
+                --muted: #9aa8a0;
+                --accent: #6cc24a;
+                --border: #2a332e;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            background: var(--bg);
+            color: var(--text);
+            font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
+            line-height: 1.7;
+        }
+
+        main {
+            width: 100%;
+            max-width: 560px;
+            padding: 40px 32px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-top: 4px solid var(--accent);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+            text-align: center;
+        }
+
+        .badge {
+            display: inline-block;
+            margin-bottom: 16px;
+            padding: 4px 12px;
+            border-radius: 999px;
+            background: color-mix(in srgb, var(--accent) 15%, transparent);
+            color: var(--accent);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+
+        /* file:// で直接開いたとき */
+        .badge.offline {
+            background: color-mix(in srgb, #d9534f 15%, transparent);
+            color: #d9534f;
+        }
+
+        h1 {
+            margin: 0 0 12px;
+            font-size: 2rem;
+        }
+
+        p {
+            margin: 0;
+            color: var(--muted);
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <span id="status" class="badge offline">NOT SERVED</span>
+        <h1>Node.js サーバー</h1>
+        <p>このページは HTTP プロトコルで動作する Node.js サーバーです。</p>
+        <h2>起動方法</h2>
+        <p>ターミナルで以下のコマンドを実行してください。</p>
+        <p>npx serve public</p>
+    </main>
+    <script>
+        // サーバー経由 (http / https) で表示されたときだけ RUNNING にする
+        if (location.protocol === 'http:' || location.protocol === 'https:') {
+            const status = document.getElementById('status');
+            status.textContent = 'RUNNING';
+            status.classList.remove('offline');
+        }
+    </script>
+</body>
+</html>

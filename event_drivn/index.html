@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>🏪 コンビニでわかるイベントループ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body class="bg-gray-100 flex flex-col items-center p-6">
+
+    <h1 class="text-2xl font-bold mb-2">🏪 コンビニでわかるイベントループ</h1>
+    <div>
+        <ul class="mb-6 text-gray-700 list-disc">
+            <li>店員さん（JavaScript）は1人だけ。レジでは一度に1つの作業しかできない。</li>
+            <li>「温め」「袋詰め」など<strong>今のお客さんの追加作業</strong>（マイクロタスク）は、すべて終わらせてから次へ。</li>
+            <li>追加作業がなくなったら、<strong>レジ待ちの列</strong>（マクロタスク）から次のお客さんを1人呼ぶ。</li>
+        </ul>
+    </div>
+
+    <!-- コンテナ -->
+    <div class="flex gap-8">
+
+        <!-- コールスタック -->
+        <div class="box w-52 h-72 flex flex-col">
+            <h2 class="text-center font-bold">🧑‍💼 レジで対応中</h2>
+            <p class="text-center text-xs text-gray-500 mb-2">＝ コールスタック</p>
+            <div id="stack" class="flex-1 flex flex-col-reverse"></div>
+        </div>
+
+        <!-- イベントループ -->
+        <div class="flex flex-col items-center justify-center">
+            <div
+                class="w-32 h-32 rounded-full border-4 border-gray-600 flex items-center justify-center font-bold bg-yellow-50 text-center">
+                店員さんの<br>確認ループ
+            </div>
+            <p class="text-xs text-gray-500 mt-1">＝ イベントループ</p>
+            <p class="quote mt-2 text-sm">「お次でお待ちのお客様〜」</p>
+            <div class="mt-4 flex flex-col gap-2">
+                <button id="addMacro" class="px-2 py-2 bg-blue-500 text-sm text-white rounded hover:bg-blue-600">
+                    🚶 お客さんが並ぶ
+                </button>
+                <button id="addMicro" class="px-2 py-2 bg-green-500 text-sm text-white rounded hover:bg-green-600">
+                    🍱 追加作業が発生
+                </button>
+            </div>
+        </div>
+
+        <!-- キュー -->
+        <div class="flex gap-4">
+            <div class="box w-52 h-72 flex flex-col">
+                <h2 class="text-center font-bold">🍱 追加作業リスト</h2>
+                <p class="text-center text-xs text-gray-500 mb-2">＝ マイクロタスクキュー</p>
+                <div id="microQueue" class="flex-1 flex flex-col-reverse"></div>
+            </div>
+            <div class="box w-52 h-72 flex flex-col">
+                <h2 class="text-center font-bold">🚶 レジ待ちの列</h2>
+                <p class="text-center text-xs text-gray-500 mb-2">＝ マクロタスクキュー</p>
+                <div id="macroQueue" class="flex-1 flex flex-col-reverse"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ログ -->
+    <h2 class="mt-8 font-bold text-lg">📜 レジの記録</h2>
+    <div id="log"></div>
+
+    <script src="js/app.js"></script>
+
+</body>
+
+</html>
