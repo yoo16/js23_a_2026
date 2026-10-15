@@ -6,10 +6,9 @@
 console.log("hello.js を実行しました");
 
 // TODO: 2. 変数 message にテキスト代入
-var message = "こんにちは";
+var message = "";
 
 // TODO: 3. 変数 message の内容をコンソール表示
-console.log(message)
 
 // ターミナルでhello.js を実行
 // node hello.js
