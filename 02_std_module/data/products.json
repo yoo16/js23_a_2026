@@ -1,0 +1,37 @@
+[
+    {
+        "id": 1,
+        "name": "ブレンドコーヒー",
+        "category": "ドリンク",
+        "price": 420,
+        "stock": 80
+    },
+    {
+        "id": 2,
+        "name": "カフェラテ",
+        "category": "ドリンク",
+        "price": 480,
+        "stock": 60
+    },
+    {
+        "id": 3,
+        "name": "アイスティー",
+        "category": "ドリンク",
+        "price": 450,
+        "stock": 70
+    },
+    {
+        "id": 4,
+        "name": "クロワッサン",
+        "category": "フード",
+        "price": 320,
+        "stock": 25
+    },
+    {
+        "id": 5,
+        "name": "チーズケーキ",
+        "category": "スイーツ",
+        "price": 520,
+        "stock": 18
+    }
+]
