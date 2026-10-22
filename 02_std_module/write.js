@@ -21,8 +21,8 @@ console.log("📖 ファイル読み込み書き込み中...");
 
 // student オブジェクト定義
 const student = {
-    no: "0000001",
-    name: "東京 太郎",
+    no: "01",
+    name: "HAL 太郎",
     createdAt: new Date().toISOString()
 };
 
