@@ -10,7 +10,8 @@ import path from 'path'
 /**
  * ファイル書き出し
  */
-// TODO: __dirname を定義: EMS環境では必須
+// TODO: __dirname を定義: ESM環境では必須
+const __dirname = path.resolve()
 
 // 現在のディレクトリパスから、data/student.json を指定
 const filePath = path.join(__dirname, "data", "student.json");
