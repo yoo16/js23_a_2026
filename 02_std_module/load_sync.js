@@ -19,7 +19,7 @@ console.log("📖 ファイル読み込み開始（同期）...");
 try {
     // 2) 同期でファイル読み込み
     // TODO: readFileSync(パス, 文字コード)
-    const data = {};
+    const data = fs.readFileSync(filePath, "utf-8")
 
     // 3) 読み込み完了後に実行
     show(data);
