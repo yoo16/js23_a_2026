@@ -2,8 +2,10 @@
  * モジュール読み込み(ESM形式)
  */
 // TODO: fsモジュール読み込む: ESM形式
+import fs from 'fs'
 
 // TODO: pathモジュールを読み込む: ESM形式
+import path from 'path'
 
 /**
  * ファイル書き出し
