@@ -24,14 +24,14 @@ if (!fs.existsSync(dataDir)) {
 let memos = loadFile(memoFile);
 
 // TODO: コンソール表示（標準出力）
-// process.stdout.write("メモを入力してください（空Enterで保存 / Ctrl+Cで終了）\n");
-// process.stdout.write("コマンド: /list → 一覧表示, /save → 保存 /clear → 全削除\n> ");
+process.stdout.write("メモを入力してください（空Enterで保存 / Ctrl+Cで終了）\n");
+process.stdout.write("コマンド: /list → 一覧表示, /save → 保存 /clear → 全削除\n> ");
 
 // ===============================
 // 通常入力処理（dataイベント）
 // ===============================
 // TODO: コンソール入力（標準入力）: Enterで data イベント発火
-process.stdin.on("", (input) => {
+process.stdin.on("data", (input) => {
     // 入力テキスト取得
     const text = input.toString().trim();
 
@@ -65,7 +65,7 @@ process.stdin.on("", (input) => {
 // readableイベント（コマンド検出）
 // ===============================
 // TODO: コマンド入力検出：readable イベントで処理
-process.stdin.on("", () => {
+process.stdin.on("readable", () => {
     let chunk;
     while ((chunk = process.stdin.read()) !== null) {
         // コマンド取得
