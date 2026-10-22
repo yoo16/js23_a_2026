@@ -12,7 +12,7 @@ const path = require('path');
  * ファイル読み込み処理
  */
 // TODO: 現在のディレクトリパスから、data/products.json を指定
-const filePath = "";
+const filePath = path.join(__dirname, 'data', 'products.json')
 
 // 1) 最初に実行
 console.log("📖 ファイル読み込み開始（非同期）...");
