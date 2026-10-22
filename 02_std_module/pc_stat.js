@@ -1,4 +1,5 @@
 // TODO: osモジュールインポート
+const os = require('os');
 
 // OS情報取得
 const type = os.type();
