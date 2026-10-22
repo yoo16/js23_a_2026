@@ -17,7 +17,7 @@ const __dirname = path.resolve()
 const filePath = path.join(__dirname, "data", "student.json");
 
 // 1) 書き出し開始
-console.log("📖 ファイル読み込み書き込み中...");
+console.log("📖 ファイル書き込み中...");
 
 // student オブジェクト定義
 const student = {
@@ -37,8 +37,8 @@ try {
     console.error("❌ ファイル書き出しエラー:", error.message);
 }
 
-// 3) ファイル読み込み中のメッセージ
-console.log("⚙️ ファイル読み込み中...");
+// 3) ファイル書き込み中のメッセージ
+console.log("⚙️ ファイル書き込み中...");
 
 /**
  * ファイル書き込み完了
