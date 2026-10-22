@@ -1,15 +1,17 @@
 /**
  * モジュール読み込み（CommonJS）
  */
-// TODO: fs モジュールを読み込む: CommonJS形式
+// TODO: fsモジュール読み込む: CommonJS形式
+const fs = require('fs');
 
-// TODO: path モジュールを読み込む: CommonJS形式
+// TODO: pathモジュールを読み込む: CommonJS形式
+const path = require('path');
 
 /**
  * ファイル読み込み処理
  */
 // TODO: 現在のディレクトリパスから、data/products.json を指定
-const filePath = "";
+const filePath = path.join(__dirname, 'data', 'products.json')
 
 // 1) 最初に実行
 console.log("📖 ファイル読み込み開始（同期）...");
