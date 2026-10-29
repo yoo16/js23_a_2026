@@ -79,8 +79,10 @@ const server = http.createServer((req, res) => {
         // }
 
         // TODO: 200 OK
+        res.writeHead(200, { "Content-Type": mime });
 
         // TODO: ファイルの中身をレスポンス
+        res.end(data)
     });
 });
 
