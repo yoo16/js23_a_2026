@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Node Server(HTML)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+
+    <header class="bg-sky-600 text-white p-4 shadow-md">
+        <h1 class="text-2xl font-bold text-center">🌐 Node Server</h1>
+    </header>
+
+    <main class="container m-auto flex flex-col justify-center items-center space-y-6">
+
+        <div class="bg-white p-6 w-full text-center">
+            <h2 class="text-xl font-bold mb-3 text-sky-600">Home Page</h2>
+            <p class="text-gray-600 mb-4">
+                Node.js の簡易Webサーバへようこそ！
+            </p>
+            <a href="/about.html" class="bg-sky-500 hover:bg-sky-700 transition text-white px-4 py-2 rounded">
+                About ページへ ➤
+            </a>
+        </div>
+
+        <div class="bg-white p-4 w-full text-center">
+            <p class="text-gray-500 text-sm">
+                public/index.html を返しています
+            </p>
+        </div>
+
+        <div class="bg-white p-4 w-full text-center">
+            <h3 class="p-2">JSの実行結果</h3>
+            <p id="message" class="text-gray-500 text-sm"></p>
+        </div>
+
+        <div class="bg-white p-6 w-full text-center">
+            <h3 class="p-2">サーバプログラム実行</h3>
+            <a href="/hello.php" class="mx-2 bg-sky-500 hover:bg-sky-700 transition text-white px-4 py-2 rounded" target="_blank">
+                hello.php 実行
+            </a>
+            <a href="/hello.py" class="mx-2 bg-sky-500 hover:bg-sky-700 transition text-white px-4 py-2 rounded" target="_blank">
+                hello.py 実行
+            </a>
+        </div>
+    </main>
+
+    <script src="/js/app.js"></script>
+</body>
+
+</html>

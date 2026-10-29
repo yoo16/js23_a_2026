@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>About</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+
+    <header class="bg-sky-600 text-white p-4 shadow-md">
+        <h1 class="text-2xl font-bold text-center">📘 About</h1>
+    </header>
+
+    <main class="container m-auto flex flex-col justify-center items-center space-y-6">
+
+        <div class="bg-white p-6 rounded-lg w-full text-center">
+            <h2 class="text-xl font-bold mb-3 text-sky-600">このページについて</h2>
+            <p class="text-gray-600 mb-4">
+                このサイトは Node.js + TailwindCSS で構築された
+                シンプルな静的ファイルサーバーのデモです。
+            </p>
+            <a href="/" class="bg-sky-500 hover:bg-sky-700 transition text-white px-4 py-2 rounded">
+                ← Homeへ戻る
+            </a>
+        </div>
+
+        <div class="bg-white p-4 rounded-lg w-full text-center">
+            <p class="text-gray-500 text-sm">
+                public/about.html を返しています
+            </p>
+        </div>
+
+        <div class="bg-white p-4 rounded-lg w-full text-center">
+            <p id="message" class="text-gray-500 text-sm"></p>
+        </div>
+    </main>
+
+    <script src="/js/app.js"></script>
+</body>
+
+</html>
