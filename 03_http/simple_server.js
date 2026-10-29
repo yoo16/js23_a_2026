@@ -29,7 +29,9 @@ const HOST = "localhost";
 const PORT = 3000;
 
 // TODO: サーバ起動
-console.log(`🚀 Server running at http://${HOST}:${PORT}`);
+server.listen(PORT, HOST, () => {
+    console.log(`🚀 Server unning at http://${HOST}:${PORT}`);
+})
 
 // ターミナル： node server.js で起動
 // サーバ停止： Ctrl + C
