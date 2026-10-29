@@ -41,6 +41,9 @@ const server = http.createServer((req, res) => {
     console.log(`pathname: ${pathname}`);
 
     // TODO: パスが「 / 」なら pathname = /index.html
+    if (pathname === "/") {
+        pathname = "/index.html";
+    }
 
     // 番外編: /api/list アクセス時: execLS()
 
