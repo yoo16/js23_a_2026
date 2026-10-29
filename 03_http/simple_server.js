@@ -5,6 +5,7 @@ import http from 'http'
 http.createServer((req, res) => {
     // ---- ここから記述 ----
     // TODO: ヘッダー
+    res.writeHead(200, { 'Content-Type': 'text/plain' })
 
     // データ作成
     const data = {
