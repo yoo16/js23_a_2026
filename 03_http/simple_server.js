@@ -1,6 +1,11 @@
 // TODO: httpモジュールをインポート: import
+import http from 'http'
 
 // TODO: HTTPサーバ作成: http.createServer()
+http.createServer(() => {
+    // 処理を記述
+})
+
     // ---- ここから記述 ----
     // TODO: ヘッダー
 
