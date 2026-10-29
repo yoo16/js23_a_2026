@@ -47,8 +47,8 @@ const server = http.createServer((req, res) => {
 
     // 番外編: /api/list アクセス時: execLS()
     if (pathname === "/api/list") {
-        return execLS(res);
-    }
+    return execLS(res);
+}
 
     // アクセスファイルの絶対パス
     const filePath = path.join(publicDir, pathname);
