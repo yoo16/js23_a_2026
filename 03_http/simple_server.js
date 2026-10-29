@@ -2,7 +2,7 @@
 import http from 'http'
 
 // TODO: HTTPサーバ作成: http.createServer()
-http.createServer((req, res) => {
+const server = http.createServer((req, res) => {
     // ---- ここから記述 ----
     // TODO: ヘッダー
     res.writeHead(200, { 'Content-Type': 'text/plain' })
@@ -24,9 +24,9 @@ http.createServer((req, res) => {
 })
 
 // TODO: サーバホスト: localhost
-const HOST = "";
+const HOST = "localhost";
 // TODO: サーバポート: 3000
-const PORT = 0;
+const PORT = 3000;
 
 // TODO: サーバ起動
 console.log(`🚀 Server running at http://${HOST}:${PORT}`);
