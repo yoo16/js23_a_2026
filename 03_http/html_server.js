@@ -53,9 +53,9 @@ const server = http.createServer((req, res) => {
     // ファイル存在チェック: fs.existsSync()
     if (!fs.existsSync(filePath)) {
         // TODO: 404 Not Found
-        // res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
-        // res.end("404 Not Found\n");
-        // return;
+        res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+        res.end("404 Not Found\n");
+        return;
     }
 
     // TODO: ファイル存在チェック
