@@ -23,9 +23,15 @@ console.table(result);
 const newPassword = '2222';
 // TODO: ソルト生成（文字）: genSaltSync() 
 // TODO: ハッシュ化: hashSync()
-const newHash = "";
+const newHash = bcrypt.hashSync(newPassword, bcrypt.genSaltSync(10))
 
 // 結果表示
 result = { newPassword, newHash }
 console.log('新しいパスワードのハッシュ化結果:');
+console.table(result);
+
+// 新しいハッシュと既存のハッシュの比較
+const isNewAuth = bcrypt.compareSync(newPassword, newHash)
+result = { newPassword, newHash, isNewAuth }
+console.log('新しいハッシュと平文の比較結果:');
 console.table(result);
