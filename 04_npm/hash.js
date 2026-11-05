@@ -1,5 +1,5 @@
 // TODO: bcrypt インポート
-// const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt');
 
 /**
  * 平文パスワードとハッシュの比較
@@ -9,7 +9,7 @@ const hash = '$2b$10$DZfvGBqDyS2TVal7PfxpreZMIyG7OWu4ocUodf3FhfYtJmasfujYq';
 // TODO: 平文パスワード
 const password = '1111';
 // TODO: 平文とハッシュの比較: compareSync()
-const isAuth = false;
+const isAuth = bcrypt.compareSync(password, hash)
 
 // 結果表示
 let result = { password, hash, isAuth }
