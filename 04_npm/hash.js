@@ -7,7 +7,7 @@ const bcrypt = require('bcrypt');
 // 既存のハッシュ値
 const hash = '$2b$10$DZfvGBqDyS2TVal7PfxpreZMIyG7OWu4ocUodf3FhfYtJmasfujYq';
 // TODO: 平文パスワード
-const password = '1111';
+const password = '9999';
 // TODO: 平文とハッシュの比較: compareSync()
 const isAuth = bcrypt.compareSync(password, hash)
 
