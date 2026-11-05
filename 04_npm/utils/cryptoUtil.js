@@ -1,9 +1,9 @@
 // TODO: cryptoモジュールをインポート
-// const crypto = require("crypto");
+const crypto = require("crypto");
 
 // 鍵生成用関数（共通）
 function generateKey(secret = "mySecretKey") {
-    // TODO: SHA-256でハッシュ化し、base64エンコード後、先頭32文字を抽出
+    // SHA-256でハッシュ化し、base64エンコード後、先頭32文字を抽出
     return crypto.createHash("sha256").update(secret).digest("base64").substr(0, 32);
 }
 
@@ -36,3 +36,9 @@ function decrypt(encryptedData, key) {
 }
 
 // TODO: エクスポート: module.exports で各メソッドを公開
+
+module.exports = {
+    generateKey,
+    encrypt,
+    decrypt
+}
