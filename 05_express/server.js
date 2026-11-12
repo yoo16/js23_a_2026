@@ -86,6 +86,14 @@ app.get('/about', (req, res) => {
 
 // TODO: GET /search  => keyword クエリパラメータ対応
 // /public/home.html
+app.get('/search', (req, res) => {
+    console.log("ルーティング: /search");
+    if (req.query.keyword) {
+        const keyword = req.query.keyword;
+        console.log("検索キーワード: " + keyword);
+    }
+    res.sendFile(__dirname + '/public/home.html');
+});
 
 // TODO GET /product/:id  => id パスパラメータ対応
 // /public/product.html
