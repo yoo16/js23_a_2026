@@ -1,0 +1,38 @@
+[
+    {
+        "id": 1,
+        "category": "men",
+        "name": "Oxford Shirt",
+        "note": "Classic fit for men",
+        "price": 4500,
+        "image": "images/Oxford-Shirt.png",
+        "tag": null
+    },
+    {
+        "id": 2,
+        "category": "women",
+        "name": "Floral Dress",
+        "note": "Elegant spring design",
+        "price": 6200,
+        "image": "images/Floral-Dress.png",
+        "tag": "SALE"
+    },
+    {
+        "id": 3,
+        "category": "men",
+        "name": "Hoodie",
+        "note": "Comfort casual wear",
+        "price": 5000,
+        "image": "images/Hoodie.png",
+        "tag": "NEW"
+    },
+    {
+        "id": 4,
+        "category": "women",
+        "name": "Pleated Skirt",
+        "note": "Soft and flowy",
+        "price": 3800,
+        "image": "images/Pleated-Skirt.png",
+        "tag": "HOT"
+    }
+]

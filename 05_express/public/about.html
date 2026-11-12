@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Spring Apparel</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/site.css">
+</head>
+
+<body class="min-h-screen bg-stone-50 font-['Inter','Noto_Sans_JP',sans-serif] text-stone-800">
+
+    <!-- ============================= -->
+    <!-- ヘッダー -->
+    <!-- ============================= -->
+    <header class="sticky top-0 z-30 border-b border-stone-200/70 bg-white/80 backdrop-blur">
+        <div class="mx-auto flex h-16 max-w-6xl items-center justify-between px-5">
+            <h1 id="shop-title">
+                <a href="/" class="flex items-center gap-2.5 text-lg font-semibold tracking-tight text-stone-900">
+                    <span class="grid h-8 w-8 place-items-center rounded-full bg-emerald-600 text-sm text-white">S</span>
+                    Spring Apparel
+                </a>
+            </h1>
+            <nav class="flex items-center gap-1 text-sm font-medium text-stone-600">
+                <a href="/" class="nav-link rounded-full px-4 py-2 transition hover:bg-stone-100 hover:text-stone-900">Home</a>
+                <a href="/about" aria-current="page" class="nav-link rounded-full px-4 py-2 transition hover:bg-stone-100 hover:text-stone-900">About</a>
+                <a href="/cart.html" class="nav-link flex items-center gap-2 rounded-full px-4 py-2 transition hover:bg-stone-100 hover:text-stone-900">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 7h12l-1 12H7L6 7z M9 7a3 3 0 016 0" />
+                    </svg>
+                    Cart
+                    <span id="cart-count" class="hidden min-w-5 rounded-full bg-emerald-600 px-1.5 text-center text-xs leading-5 text-white">0</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+
+        <!-- ============================= -->
+        <!-- ヒーロー -->
+        <!-- ============================= -->
+        <section class="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-sky-50">
+            <div class="pointer-events-none absolute -left-20 top-0 h-72 w-72 rounded-full bg-emerald-200/40 blur-3xl"></div>
+            <div class="pointer-events-none absolute -bottom-20 right-10 h-72 w-72 rounded-full bg-sky-200/40 blur-3xl"></div>
+            <div class="relative mx-auto max-w-4xl px-5 py-24 text-center sm:py-32">
+                <p class="mb-4 text-xs font-semibold uppercase tracking-[0.25em] text-emerald-700">About Us</p>
+                <h2 class="text-4xl font-semibold leading-tight tracking-tight text-stone-900 sm:text-6xl">
+                    A Gentle Start<br>for Every Day
+                </h2>
+                <p class="mx-auto mt-8 max-w-2xl text-base leading-relaxed text-stone-600 sm:text-lg">
+                    朝の空気のように、やわらかく。<br>
+                    Spring Apparel は、日々の気分にそっと寄り添うワードローブを提案します。
+                </p>
+            </div>
+        </section>
+
+        <!-- ============================= -->
+        <!-- コンセプト -->
+        <!-- ============================= -->
+        <div class="mx-auto max-w-4xl px-5 py-8 sm:py-16">
+
+            <!-- Concept -->
+            <section class="grid gap-6 border-b border-stone-200 py-12 md:grid-cols-[200px_1fr] md:gap-12">
+                <div>
+                    <p class="text-sm font-semibold text-emerald-700">01</p>
+                    <h3 class="mt-1 text-2xl font-semibold tracking-tight text-stone-900">Concept</h3>
+                </div>
+                <div class="space-y-5 text-base leading-loose text-stone-600">
+                    <p>
+                        私たちの服づくりは、「軽やかさ」を中心に置いています。
+                        大げさではなく、主張しすぎない。
+                        けれど、袖を通すと気分がふっと明るくなるような一枚。
+                    </p>
+                    <p>
+                        そのために、素材のやわらかさ、色の透明感、着心地の良さを大切にしています。
+                    </p>
+                </div>
+            </section>
+
+            <!-- Craft -->
+            <section class="grid gap-6 border-b border-stone-200 py-12 md:grid-cols-[200px_1fr] md:gap-12">
+                <div>
+                    <p class="text-sm font-semibold text-emerald-700">02</p>
+                    <h3 class="mt-1 text-2xl font-semibold tracking-tight text-stone-900">Craft</h3>
+                </div>
+                <div class="space-y-5 text-base leading-loose text-stone-600">
+                    <p>
+                        形はシンプルに、細部は丁寧に。
+                        シルエットのバランスや、肌にふれたときの優しさを追求しています。
+                    </p>
+                    <p>
+                        流行に左右されすぎない“ずっと着られる一枚”であること。
+                        それが私たちの考える、美しさの一つです。
+                    </p>
+                </div>
+            </section>
+
+            <!-- Season -->
+            <section class="grid gap-6 border-b border-stone-200 py-12 md:grid-cols-[200px_1fr] md:gap-12">
+                <div>
+                    <p class="text-sm font-semibold text-emerald-700">03</p>
+                    <h3 class="mt-1 text-2xl font-semibold tracking-tight text-stone-900">Season</h3>
+                </div>
+                <div class="space-y-5 text-base leading-loose text-stone-600">
+                    <p>
+                        春の透明感、夏の軽さ、秋のニュアンス、冬の静けさ。
+                        季節ごとに変わる空気を服の中に少しだけ閉じ込めています。
+                    </p>
+                    <p>
+                        その季節にしかないムードを楽しめるよう、色と素材を選び抜いています。
+                    </p>
+                </div>
+            </section>
+
+            <!-- Vision -->
+            <section class="grid gap-6 py-12 md:grid-cols-[200px_1fr] md:gap-12">
+                <div>
+                    <p class="text-sm font-semibold text-emerald-700">04</p>
+                    <h3 class="mt-1 text-2xl font-semibold tracking-tight text-stone-900">Vision</h3>
+                </div>
+                <div class="space-y-5 text-base leading-loose text-stone-600">
+                    <p>
+                        毎日が少し軽くなる。
+                        そんなワードローブをつくることが、私たちの願いです。
+                    </p>
+                    <p>
+                        自然体でいられる美しさを、これからも追い続けていきます。
+                    </p>
+                </div>
+            </section>
+        </div>
+
+        <!-- ============================= -->
+        <!-- CTA -->
+        <!-- ============================= -->
+        <section class="mx-auto max-w-4xl px-5 pb-20">
+            <div class="rounded-3xl bg-stone-900 px-8 py-14 text-center text-white sm:px-14">
+                <h3 class="text-2xl font-semibold tracking-tight sm:text-3xl">Find your everyday favorite</h3>
+                <p class="mt-3 text-sm text-stone-300">春の新作コレクションをご覧ください。</p>
+                <a href="/"
+                    class="mt-8 inline-flex rounded-full bg-white px-7 py-3 text-sm font-medium text-stone-900 transition hover:bg-emerald-100">
+                    View products
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- ============================= -->
+    <!-- フッター -->
+    <!-- ============================= -->
+    <footer class="border-t border-stone-200 bg-white">
+        <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-5 py-8 text-xs text-stone-500 sm:flex-row">
+            <p>&copy; 2026 Spring Apparel</p>
+            <p>Node.js &amp; Express Sample Shop</p>
+        </div>
+    </footer>
+</body>
+
+</html>
