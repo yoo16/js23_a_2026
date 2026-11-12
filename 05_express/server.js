@@ -64,6 +64,10 @@ app.get('/test', (req, res) => {
 
 // TODO: GET /
 // /public/home.html
+app.get('/', (req, res) => {
+    console.log("ルーティング: /");
+    res.sendFile(__dirname + '/public/home.html');
+});
 
 // TODO: GET /info
 app.get('/info', (req, res) => {
