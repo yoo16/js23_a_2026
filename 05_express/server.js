@@ -83,6 +83,11 @@ app.get('/info', (req, res) => {
 // /public/product.html
 
 // TODO: POST /save
+app.post('/save', (req, res) => {
+    console.log("ルーティング: /save");
+    const message = 'POSTリクエストを受け取りました';
+    res.send(message);
+});
 
 // ------------------------
 // API
