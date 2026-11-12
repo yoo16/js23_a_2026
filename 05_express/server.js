@@ -49,11 +49,18 @@ let cartItems = [];
 // ルーティング
 // ------------------------
 // TODO: GET /test
-// app.get('/test', (req, res) => {
-//     console.log("ルーティング: /test");
-//     const message = 'Hello, Express!';
-//     res.send(message);
-// });
+app.get('/test', (req, res) => {
+    console.log("ルーティング: /test");
+    const message = 'Hello, Express!';
+    res.send(message);
+});
+
+// Flaskの場合
+// @app.route('/test', methods=['GET'])
+// def test():
+//     print("ルーティング: /test")
+//     message = 'Hello, Express!'
+//     return message
 
 // TODO: GET /
 // /public/home.html
