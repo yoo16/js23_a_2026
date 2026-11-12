@@ -66,6 +66,12 @@ app.get('/test', (req, res) => {
 // /public/home.html
 
 // TODO: GET /info
+app.get('/info', (req, res) => {
+    console.log("ルーティング: /info");
+    const message = 'ここは情報ページです';
+    res.send(message);
+});
+
 
 // TODO: GET /about
 // /public/about.html
