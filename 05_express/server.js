@@ -89,6 +89,12 @@ app.get('/about', (req, res) => {
 
 // TODO GET /product/:id  => id パスパラメータ対応
 // /public/product.html
+app.get('/product/:id', (req, res) => {
+    // 商品IDを取得
+    const id = req.params.id;
+    console.log("ルーティング: /product/" + id);
+    res.sendFile(__dirname + '/public/product.html');
+});
 
 // TODO: POST /save
 app.post('/save', (req, res) => {
