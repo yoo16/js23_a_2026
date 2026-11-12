@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 // path モジュールのインポート
 import path from 'path';
 // TODO: express インポート(ESM)
+import express from 'express';
 
 // Dotenvの設定をロード
 dotenv.config();
@@ -22,6 +23,7 @@ const status = { HOST, PORT, BASE_URL, __dirname };
 console.log(status);
 
 // TODO: Expressアプリケーションの初期化
+const app = express();
 
 // ミドルウェア設定
 // カスタムミドルウェア: すべてのリクエストでログ出力
@@ -140,6 +142,6 @@ app.post('/api/cart/add/:id', (req, res) => {
 });
 
 // TODO: Express 起動
-// app.listen(PORT, HOST, () => {
-//     console.log(`Server running: ${BASE_URL}`);
-// });
+app.listen(PORT, HOST, () => {
+    console.log(`Server running: ${BASE_URL}`);
+});
