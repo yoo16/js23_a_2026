@@ -119,7 +119,7 @@ app.get('/api/product/list', (req, res) => {
     console.log("ルーティング: api/product/list");
 
     // TODO: 商品データを読み込む
-    const products = {};
+    const products = fetchProducts()
     const data = { products };
     // 商品データを返す
     res.json(data);
