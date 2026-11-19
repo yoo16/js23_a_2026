@@ -28,19 +28,19 @@ const app = express();
 // ミドルウェア設定
 // カスタムミドルウェア: すべてのリクエストでログ出力
 // TODO: app.use() で登録
-// app.use((req, res, next) => {
-//     console.log(`ミドルウェア: ${req.method} ${req.url}`);
-//     next();
-// });
+app.use((req, res, next) => {
+    console.log(`ミドルウェア: ${req.method} ${req.url}`);
+    next();
+});
 
 // TODO: JSONボディパーサー
-// app.use(express.json());
+app.use(express.json());
 
 // TODO: URLエンコード: www-form-urlencoded ボディパーサー
-// app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 
 // TODO: 静的ファイルの公開: /public
-// app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/public'));
 
 // カート情報
 let cartItems = [];
