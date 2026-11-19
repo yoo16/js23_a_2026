@@ -128,7 +128,7 @@ app.get('/api/product/list', (req, res) => {
 // GET: エンドポイント: /api/product/show/:id
 app.get('/api/product/show/:id', (req, res) => {
     // TODO: 商品IDを取得して数値に変換
-    const productId = 0;
+    const productId = req.params.id
     console.log(`ルーティング: /api/product/show/${productId}`);
 
     // 商品データを取得
@@ -146,7 +146,7 @@ app.get('/api/search', (req, res) => {
     console.log("ルーティング: api/search");
 
     // TODO: 検索キーワードを取得
-    const keyword = '';
+    const keyword = req.query.keyword
     console.log("検索キーワード: " + keyword);
 
     const products = searchProducts(keyword);
