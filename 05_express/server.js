@@ -161,6 +161,7 @@ app.get('/api/product/csv_download', (req, res) => {
     // CSV ファイルのパスを指定
     const csvFilePath = __dirname + '/data/products.csv';
     // TODO: CSV ファイルをダウンロード: download()
+    res.download(csvFilePath)
 });
 
 // POST: エンドポイント: /api/cart/add/:id : id パスパラメータ対応
@@ -172,7 +173,8 @@ app.post('/api/cart/add/:id', (req, res) => {
 
     if (product) {
         // TODO: カートに追加: スプレッド構文で cartItems に product 追加
-        cartItems = [];
+        cartItems = [...cartItems, product];
+        // cartItems.push(product);
     }
 
     const data = { cartItems };
