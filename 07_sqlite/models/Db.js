@@ -10,7 +10,7 @@ export const status = () => {
         // SQL を準備
         const statement = db.prepare(sql);
         // TODO: クエリを実行して1行取得: get()
-        const row = statement.____1____();
+        const row = statement.get();
         const file = path.relative(process.cwd(), dbFile);
         return { connected: true, version: row.version, file, errors: [], sql };
     } catch (error) {
