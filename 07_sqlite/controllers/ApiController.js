@@ -7,7 +7,7 @@ export const userList = (req, res) => {
     const users = result.users;
     const sql = result.sql;
     // TODO: JSON を返す: json()
-    // res.json({ users, sql, message: 'Listed', errors: [] });
+    res.json({ users, sql, message: 'Listed', errors: [] });
 };
 
 export const feedList = (req, res) => {

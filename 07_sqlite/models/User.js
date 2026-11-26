@@ -4,7 +4,8 @@ export const fetchAll = (limit = 20) => {
     const sql = "SELECT id, name, email, created_at FROM users ORDER BY id LIMIT ?;";
     // TODO: SQL を準備: db.prepare(sql) を statement に入れる
     // TODO: 全件取得: statement.all(limit)
-    const users = { rows: [] };
+    const statement = db.prepare(sql);
+    const users = statement.all(limit);
     return { users, sql: format(sql, [limit]) };
 };
 
