@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SQL Client · Node SQLite</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="min-h-screen bg-white text-neutral-900 antialiased">
+  <div id="header"></div>
+  <main class="mx-auto max-w-5xl px-4 py-10">
+    <h1 class="mb-6 text-2xl font-semibold tracking-tight">SQL Client</h1>
+    <section class="mb-8 divide-y divide-neutral-200 rounded-xl border border-neutral-200 text-sm">
+      <div class="flex gap-4 px-4 py-2.5"><span class="w-20 shrink-0 text-neutral-400">Endpoint</span><code id="endpoint" class="font-mono text-neutral-600"></code></div>
+      <div class="flex gap-4 px-4 py-2.5"><span class="w-20 shrink-0 text-neutral-400">SQL</span><pre id="sql" class="overflow-x-auto font-mono text-neutral-600"></pre></div>
+      <div class="flex gap-4 px-4 py-2.5"><span class="w-20 shrink-0 text-neutral-400">Message</span><span id="message" class="font-mono text-neutral-600"></span></div>
+    </section>
+    <div class="mb-6 flex flex-wrap items-center gap-2">
+      <button data-url="/api/users/count" class="query-button rounded-lg border border-neutral-200 px-3 py-1.5 text-sm transition hover:border-neutral-900">Users count</button>
+      <button data-url="/api/feeds/join" class="query-button rounded-lg border border-neutral-200 px-3 py-1.5 text-sm transition hover:border-neutral-900">Feeds JOIN users</button>
+      <form id="email-form" class="ml-auto flex gap-2">
+        <input id="email" value="user1@test.com" class="w-44 rounded-lg border border-neutral-200 px-3 py-1.5 text-sm focus:border-neutral-900 focus:outline-none" />
+        <button class="rounded-lg bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-neutral-700">Find by email</button>
+      </form>
+    </div>
+    <div id="result" class="overflow-x-auto rounded-xl border border-neutral-200">
+      <p class="px-4 py-10 text-center text-sm text-neutral-400">クエリを選んでください</p>
+    </div>
+    <section class="mt-10 rounded-xl bg-neutral-50 px-5 py-4 text-sm leading-relaxed text-neutral-600">
+      <h2 class="mb-2 font-medium text-neutral-900">解説</h2>
+      <ul class="list-disc space-y-1 pl-5">
+        <li>ボタンを押すと、定義済みのクエリを API 経由で実行し、実行された SQL と結果を表示します。</li>
+        <li><b>Users count</b>: <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">COUNT(*)</code> の結果は1行なので、<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">get()</code> で取得します。</li>
+        <li><b>Feeds JOIN users</b>: <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">feeds</code> と <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">users</code> を <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">JOIN</code> し、投稿者名つきの feeds を取得します（SQL は Feeds ページと同じ）。</li>
+        <li><b>Find by email</b>: <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">WHERE email = ?</code> のプレースホルダに、入力した値を渡して検索します。</li>
+        <li>任意の SQL を実行したいときは、ターミナルで <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">node db_query.js "SELECT * FROM users LIMIT 3"</code> を使います。</li>
+      </ul>
+      <pre class="mt-4 overflow-x-auto rounded-xl bg-neutral-900 p-4 font-mono text-sm leading-relaxed text-neutral-100"><code><span class="text-neutral-500">// models/User.js: 件数 (1行だけ返すので get())</span>
+<span class="text-sky-300">export</span> <span class="text-sky-300">const</span> count = () =&gt; {
+    <span class="text-sky-300">const</span> sql = <span class="text-emerald-300">"SELECT COUNT(*) AS count FROM users;"</span>;
+    <span class="text-sky-300">const</span> statement = db.prepare(sql);
+    <span class="text-sky-300">const</span> row = statement.get();
+    <span class="text-sky-300">return</span> { count: row.count, sql };
+};
+
+<span class="text-neutral-500">// models/User.js: メールで検索 (? に値を渡す)</span>
+<span class="text-sky-300">export</span> <span class="text-sky-300">const</span> findByEmail = (email) =&gt; {
+    <span class="text-sky-300">const</span> sql = <span class="text-emerald-300">"SELECT id, name, email, created_at FROM users WHERE email = ?;"</span>;
+    <span class="text-sky-300">const</span> statement = db.prepare(sql);
+    <span class="text-sky-300">const</span> users = statement.all(email);
+    <span class="text-sky-300">return</span> { users, sql: format(sql, [email]) };
+};</code></pre>
+    </section>
+  </main>
+  <script type="module">
+    import { api, showStatus, esc } from '/js/layout.js';
+
+    async function run(url) {
+      const result = await api(url);
+      showStatus({ ...result, endpoint: `GET ${url}` });
+      const rows = result.data ?? [];
+      const columns = rows.length ? Object.keys(rows[0]) : [];
+      document.getElementById('result').innerHTML = rows.length ? `
+        <table class="w-full text-left text-sm">
+          <thead class="border-b border-neutral-200 bg-neutral-50 text-neutral-500"><tr>${columns.map((column) => `<th class="px-4 py-2.5 font-medium">${esc(column)}</th>`).join('')}</tr></thead>
+          <tbody class="divide-y divide-neutral-100">${rows.map((row) => `<tr>${columns.map((column) => `<td class="px-4 py-2.5">${esc(row[column])}</td>`).join('')}</tr>`).join('')}</tbody>
+        </table>` : '<p class="px-4 py-10 text-center text-sm text-neutral-400">0 rows</p>';
+    }
+
+    document.querySelectorAll('.query-button').forEach((button) => button.addEventListener('click', () => run(button.dataset.url)));
+    document.getElementById('email-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      run(`/api/users/by-email?email=${encodeURIComponent(document.getElementById('email').value)}`);
+    });
+  </script>
+</body>
+</html>

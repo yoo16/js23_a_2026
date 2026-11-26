@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home · Node SQLite</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="min-h-screen bg-white text-neutral-900 antialiased">
+  <div id="header"></div>
+  <main class="mx-auto max-w-5xl px-4 py-10">
+    <div class="mb-12">
+      <p class="mb-3 text-sm font-medium text-neutral-400">Express · SQLite · Tailwind CSS</p>
+      <h1 class="text-4xl font-semibold tracking-tight">Node.js + SQLite sample</h1>
+      <p class="mt-4 max-w-xl text-neutral-500">サーバー不要のファイルDB。<code class="rounded bg-neutral-100 px-1.5 py-0.5 text-sm">node:sqlite</code> で SELECT / INSERT / DELETE / JOIN / トランザクション / SQLインジェクションを体験します。</p>
+      <p id="db-status" class="mt-6 inline-flex items-center gap-2 rounded-full border border-neutral-200 px-3.5 py-1.5 text-sm text-neutral-500">
+        <span id="db-dot" class="size-2.5 rounded-full bg-neutral-300"></span>
+        <span id="db-label" class="font-medium">Checking...</span>
+        <span id="db-detail" class="font-mono text-xs text-neutral-400"></span>
+      </p>
+    </div>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <a href="/feeds" class="group rounded-xl border border-neutral-200 p-5 transition hover:border-neutral-900">
+        <h2 class="font-medium">Feeds <span class="inline-block text-neutral-400 transition group-hover:translate-x-0.5">→</span></h2>
+        <p class="mt-1 text-sm text-neutral-500">投稿・削除・JOIN</p>
+      </a>
+      <a href="/users" class="group rounded-xl border border-neutral-200 p-5 transition hover:border-neutral-900">
+        <h2 class="font-medium">Users <span class="inline-block text-neutral-400 transition group-hover:translate-x-0.5">→</span></h2>
+        <p class="mt-1 text-sm text-neutral-500">ユーザー一覧</p>
+      </a>
+      <a href="/database" class="group rounded-xl border border-neutral-200 p-5 transition hover:border-neutral-900">
+        <h2 class="font-medium">Database <span class="inline-block text-neutral-400 transition group-hover:translate-x-0.5">→</span></h2>
+        <p class="mt-1 text-sm text-neutral-500">テーブル作成・データ投入</p>
+      </a>
+      <a href="/sql-client" class="group rounded-xl border border-neutral-200 p-5 transition hover:border-neutral-900">
+        <h2 class="font-medium">SQL Client <span class="inline-block text-neutral-400 transition group-hover:translate-x-0.5">→</span></h2>
+        <p class="mt-1 text-sm text-neutral-500">SQLと結果を確認</p>
+      </a>
+    </div>
+    <section class="mt-10">
+      <h2 class="mb-3 font-medium text-neutral-900">API 一覧</h2>
+      <p class="mb-3 text-sm text-neutral-500">各ページから呼び出している API です。データ取得は <b>GET</b>、追加・更新・削除は <b>POST</b> を使います。</p>
+      <div class="overflow-x-auto rounded-xl border border-neutral-200">
+        <table class="w-full text-left text-sm text-neutral-600">
+          <thead class="bg-neutral-50 text-xs text-neutral-500">
+            <tr><th class="px-3 py-2 font-medium">Endpoint</th><th class="px-3 py-2 font-medium">機能</th><th class="px-3 py-2 font-medium">SQL</th><th class="px-3 py-2 font-medium">解説</th></tr>
+          </thead>
+          <tbody>
+          <tr class="border-t border-neutral-200">
+            <td class="whitespace-nowrap px-3 py-2"><span class="inline-flex items-center overflow-hidden rounded-md border border-neutral-300 bg-white align-middle font-mono text-sm font-semibold"><span class="bg-emerald-600 px-1.5 py-0.5 text-white">GET</span><span class="px-2 py-0.5 text-neutral-900">/api/db/status</span></span></td>
+            <td class="px-3 py-2 font-medium text-neutral-900">接続確認</td>
+            <td class="px-3 py-2 font-mono text-xs text-neutral-600">SELECT sqlite_version()</td>
+            <td class="px-3 py-2">Home の Connected 表示</td>
+          </tr>
+          <tr class="border-t border-neutral-200">
+            <td class="whitespace-nowrap px-3 py-2"><span class="inline-flex items-center overflow-hidden rounded-md border border-neutral-300 bg-white align-middle font-mono text-sm font-semibold"><span class="bg-emerald-600 px-1.5 py-0.5 text-white">GET</span><span class="px-2 py-0.5 text-neutral-900">/api/db/tables</span></span></td>
+            <td class="px-3 py-2 font-medium text-neutral-900">テーブル一覧</td>
+            <td class="px-3 py-2 font-mono text-xs text-neutral-600">sqlite_master / PRAGMA table_info / COUNT(*)</td>
+            <td class="px-3 py-2">テーブル名・件数・カラムを返す</td>
+          </tr>
+          <tr class="border-t border-neutral-200">
+            <td class="whitespace-nowrap px-3 py-2"><span class="inline-flex items-center overflow-hidden rounded-md border border-neutral-300 bg-white align-middle font-mono text-sm font-semibold"><span class="bg-orange-600 px-1.5 py-0.5 text-white">POST</span><span class="px-2 py-0.5 text-neutral-900">/api/db/create</span></span></td>
+            <td class="px-3 py-2 font-medium text-neutral-900">テーブル作成</td>
+            <td class="px-3 py-2 font-mono text-xs text-neutral-600">schema.sql を実行 (CREATE TABLE)</td>
+            <td class="px-3 py-2">なければ作成</td>
+          </tr>
+          <tr class="border-t border-neutral-200">
+            <td class="whitespace-nowrap px-3 py-2"><span class="inline-flex items-center overflow-hidden rounded-md border border-neutral-300 bg-white align-middle font-mono text-sm font-semibold"><span class="bg-orange-600 px-1.5 py-0.5 text-white">POST</span><span class="px-2 py-0.5 text-neutral-900">/api/db/drop</span></span></td>
+            <td class="px-3 py-2 font-medium text-neutral-900">テーブル削除</td>
+            <td class="px-3 py-2 font-mono text-xs text-neutral-600">DROP TABLE</td>
+            <td class="px-3 py-2">feeds → users の順に削除</td>
+          </tr>
+          <tr class="border-t border-neutral-200">
+            <td class="whitespace-nowrap px-3 py-2"><span class="inline-flex items-center overflow-hidden rounded-md border border-neutral-300 bg-white align-middle font-mono text-sm font-semibold"><span class="bg-orange-600 px-1.5 py-0.5 text-white">POST</span><span class="px-2 py-0.5 text-neutral-900">/api/db/seed</span></span></td>
+            <td class="px-3 py-2 font-medium text-neutral-900">テストデータ投入</td>
+            <td class="px-3 py-2 font-mono text-xs text-neutral-600">INSERT (BEGIN … COMMIT)</td>
+            <td class="px-3 py-2">faker で users 10件・feeds 30件</td>
+          </tr>
+          <tr class="border-t border-neutral-200">
+            <td class="whitespace-nowrap px-3 py-2"><span class="inline-flex items-center overflow-hidden rounded-md border border-neutral-300 bg-white align-middle font-mono text-sm font-semibold"><span class="bg-orange-600 px-1.5 py-0.5 text-white">POST</span><span class="px-2 py-0.5 text-neutral-900">/api/db/truncate</span></span></td>
+            <td class="px-3 py-2 font-medium text-neutral-900">全データ削除</td>
+            <td class="px-3 py-2 font-mono text-xs text-neutral-600">DELETE</td>
+            <td class="px-3 py-2">AUTOINCREMENT もリセット</td>
+          </tr>
+          <tr class="border-t border-neutral-200">
+            <td class="whitespace-nowrap px-3 py-2"><span class="inline-flex items-center overflow-hidden rounded-md border border-neutral-300 bg-white align-middle font-mono text-sm font-semibold"><span class="bg-emerald-600 px-1.5 py-0.5 text-white">GET</span><span class="px-2 py-0.5 text-neutral-900">/api/users</span></span></td>
+            <td class="px-3 py-2 font-medium text-neutral-900">ユーザー一覧</td>
+            <td class="px-3 py-2 font-mono text-xs text-neutral-600">SELECT … LIMIT ?</td>
+            <td class="px-3 py-2">?limit= で件数指定</td>
+          </tr>
+          <tr class="border-t border-neutral-200">
+            <td class="whitespace-nowrap px-3 py-2"><span class="inline-flex items-center overflow-hidden rounded-md border border-neutral-300 bg-white align-middle font-mono text-sm font-semibold"><span class="bg-emerald-600 px-1.5 py-0.5 text-white">GET</span><span class="px-2 py-0.5 text-neutral-900">/api/users/count</span></span></td>
+            <td class="px-3 py-2 font-medium text-neutral-900">ユーザー数</td>
+            <td class="px-3 py-2 font-mono text-xs text-neutral-600">SELECT COUNT(*)</td>
+            <td class="px-3 py-2">SQL Client 用</td>
+          </tr>
+          <tr class="border-t border-neutral-200">
+            <td class="whitespace-nowrap px-3 py-2"><span class="inline-flex items-center overflow-hidden rounded-md border border-neutral-300 bg-white align-middle font-mono text-sm font-semibold"><span class="bg-emerald-600 px-1.5 py-0.5 text-white">GET</span><span class="px-2 py-0.5 text-neutral-900">/api/users/by-email</span></span></td>
+            <td class="px-3 py-2 font-medium text-neutral-900">メールで検索</td>
+            <td class="px-3 py-2 font-mono text-xs text-neutral-600">SELECT … WHERE email = ?</td>
+            <td class="px-3 py-2">?email= を ? で安全に渡す</td>
+          </tr>
+          <tr class="border-t border-neutral-200">
+            <td class="whitespace-nowrap px-3 py-2"><span class="inline-flex items-center overflow-hidden rounded-md border border-neutral-300 bg-white align-middle font-mono text-sm font-semibold"><span class="bg-emerald-600 px-1.5 py-0.5 text-white">GET</span><span class="px-2 py-0.5 text-neutral-900">/api/feeds</span></span></td>
+            <td class="px-3 py-2 font-medium text-neutral-900">投稿一覧</td>
+            <td class="px-3 py-2 font-mono text-xs text-neutral-600">SELECT … JOIN users</td>
+            <td class="px-3 py-2">新しい順に取得</td>
+          </tr>
+          <tr class="border-t border-neutral-200">
+            <td class="whitespace-nowrap px-3 py-2"><span class="inline-flex items-center overflow-hidden rounded-md border border-neutral-300 bg-white align-middle font-mono text-sm font-semibold"><span class="bg-emerald-600 px-1.5 py-0.5 text-white">GET</span><span class="px-2 py-0.5 text-neutral-900">/api/feeds/join</span></span></td>
+            <td class="px-3 py-2 font-medium text-neutral-900">JOIN の結果</td>
+            <td class="px-3 py-2 font-mono text-xs text-neutral-600">SELECT … JOIN users</td>
+            <td class="px-3 py-2">SQL Client 用</td>
+          </tr>
+          <tr class="border-t border-neutral-200">
+            <td class="whitespace-nowrap px-3 py-2"><span class="inline-flex items-center overflow-hidden rounded-md border border-neutral-300 bg-white align-middle font-mono text-sm font-semibold"><span class="bg-orange-600 px-1.5 py-0.5 text-white">POST</span><span class="px-2 py-0.5 text-neutral-900">/api/feeds</span></span></td>
+            <td class="px-3 py-2 font-medium text-neutral-900">投稿</td>
+            <td class="px-3 py-2 font-mono text-xs text-neutral-600">INSERT</td>
+            <td class="px-3 py-2">user_id・content を受け取る</td>
+          </tr>
+          <tr class="border-t border-neutral-200">
+            <td class="whitespace-nowrap px-3 py-2"><span class="inline-flex items-center overflow-hidden rounded-md border border-neutral-300 bg-white align-middle font-mono text-sm font-semibold"><span class="bg-orange-600 px-1.5 py-0.5 text-white">POST</span><span class="px-2 py-0.5 text-neutral-900">/api/feeds/transaction</span></span></td>
+            <td class="px-3 py-2 font-medium text-neutral-900">トランザクション</td>
+            <td class="px-3 py-2 font-mono text-xs text-neutral-600">BEGIN → INSERT×2 → COMMIT</td>
+            <td class="px-3 py-2">失敗時は ROLLBACK</td>
+          </tr>
+          <tr class="border-t border-neutral-200">
+            <td class="whitespace-nowrap px-3 py-2"><span class="inline-flex items-center overflow-hidden rounded-md border border-neutral-300 bg-white align-middle font-mono text-sm font-semibold"><span class="bg-orange-600 px-1.5 py-0.5 text-white">POST</span><span class="px-2 py-0.5 text-neutral-900">/api/feeds/injection</span></span></td>
+            <td class="px-3 py-2 font-medium text-neutral-900">SQL インジェクション (デモ)</td>
+            <td class="px-3 py-2 font-mono text-xs text-neutral-600">exec() で文字列連結</td>
+            <td class="px-3 py-2">⚠️ 危険な例</td>
+          </tr>
+          <tr class="border-t border-neutral-200">
+            <td class="whitespace-nowrap px-3 py-2"><span class="inline-flex items-center overflow-hidden rounded-md border border-neutral-300 bg-white align-middle font-mono text-sm font-semibold"><span class="bg-orange-600 px-1.5 py-0.5 text-white">POST</span><span class="px-2 py-0.5 text-neutral-900">/api/feeds/:id/update</span></span></td>
+            <td class="px-3 py-2 font-medium text-neutral-900">投稿の更新</td>
+            <td class="px-3 py-2 font-mono text-xs text-neutral-600">UPDATE … WHERE id = ?</td>
+            <td class="px-3 py-2">content を更新</td>
+          </tr>
+          <tr class="border-t border-neutral-200">
+            <td class="whitespace-nowrap px-3 py-2"><span class="inline-flex items-center overflow-hidden rounded-md border border-neutral-300 bg-white align-middle font-mono text-sm font-semibold"><span class="bg-orange-600 px-1.5 py-0.5 text-white">POST</span><span class="px-2 py-0.5 text-neutral-900">/api/feeds/:id/destroy</span></span></td>
+            <td class="px-3 py-2 font-medium text-neutral-900">投稿の削除</td>
+            <td class="px-3 py-2 font-mono text-xs text-neutral-600">DELETE … WHERE id = ?</td>
+            <td class="px-3 py-2">id で 1 件削除</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section class="mt-10 rounded-xl bg-neutral-50 px-5 py-4 text-sm leading-relaxed text-neutral-600">
+      <h2 class="mb-2 font-medium text-neutral-900">node:sqlite の基本</h2>
+      <div class="overflow-x-auto rounded-xl border border-neutral-200 bg-white">
+        <table class="w-full text-left text-sm text-neutral-600">
+          <thead class="bg-neutral-50 text-xs text-neutral-500">
+            <tr><th class="px-3 py-2 font-medium">項目</th><th class="px-3 py-2 font-medium">コード</th><th class="px-3 py-2 font-medium">解説</th></tr>
+          </thead>
+          <tbody>
+          <tr class="border-t border-neutral-200">
+            <td class="whitespace-nowrap px-3 py-2 font-medium text-neutral-900">Connected の表示</td>
+            <td class="px-3 py-2"><span class="inline-flex items-center overflow-hidden rounded-md border border-neutral-300 bg-white align-middle font-mono text-sm font-semibold"><span class="bg-emerald-600 px-1.5 py-0.5 text-white">GET</span><span class="px-2 py-0.5 text-neutral-900">/api/db/status</span></span> <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">SELECT sqlite_version()</code></td>
+            <td class="px-3 py-2">上の <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">Connected</code> は、このクエリを実行できたときに表示されます。接続できないときは <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">Not connected</code> とエラーが表示されます。</td>
+          </tr>
+          <tr class="border-t border-neutral-200">
+            <td class="whitespace-nowrap px-3 py-2 font-medium text-neutral-900">接続</td>
+            <td class="px-3 py-2"><code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">new DatabaseSync(ファイルパス)</code></td>
+            <td class="px-3 py-2">DB は 1 つのファイル（<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">database/app.db</code>）で、DB サーバーは不要です。</td>
+          </tr>
+          <tr class="border-t border-neutral-200">
+            <td class="whitespace-nowrap px-3 py-2 font-medium text-neutral-900">SQL の準備と実行</td>
+            <td class="px-3 py-2"><code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">prepare(sql)</code></td>
+            <td class="px-3 py-2">SQL を準備し、<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">all()</code>（全件）・<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">get()</code>（1 件）・<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">run()</code>（追加・更新・削除）で実行します。</td>
+          </tr>
+          <tr class="border-t border-neutral-200">
+            <td class="whitespace-nowrap px-3 py-2 font-medium text-neutral-900">結果が不要な SQL</td>
+            <td class="px-3 py-2"><code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">db.exec(sql)</code></td>
+            <td class="px-3 py-2"><code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">CREATE TABLE</code>・<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">BEGIN</code>・<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">COMMIT</code> など、結果が不要な SQL の実行に使います。</td>
+          </tr>
+          <tr class="border-t border-neutral-200">
+            <td class="whitespace-nowrap px-3 py-2 font-medium text-neutral-900">値の渡し方</td>
+            <td class="px-3 py-2"><code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">?</code></td>
+            <td class="px-3 py-2">値は <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">?</code> のプレースホルダで渡します。処理は同期なので <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">await</code> は不要です。</td>
+          </tr>
+          <tr class="border-t border-neutral-200">
+            <td class="whitespace-nowrap px-3 py-2 font-medium text-neutral-900">画面で確認</td>
+            <td class="px-3 py-2">Endpoint / SQL / Message</td>
+            <td class="px-3 py-2">各ページの上部で、呼び出した API と実行された SQL を確認できます。</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <pre class="mt-4 overflow-x-auto rounded-xl bg-neutral-900 p-4 font-mono text-sm leading-relaxed text-neutral-100"><code><span class="text-sky-300">import</span> { DatabaseSync } <span class="text-sky-300">from</span> <span class="text-emerald-300">'node:sqlite'</span>;
+
+<span class="text-sky-300">const</span> db = <span class="text-sky-300">new</span> DatabaseSync(<span class="text-emerald-300">'database/app.db'</span>);       <span class="text-neutral-500">// 接続 (ファイルがなければ作成)</span>
+db.exec(<span class="text-emerald-300">'PRAGMA foreign_keys = ON;'</span>);                 <span class="text-neutral-500">// 結果が不要な SQL は exec()</span>
+
+<span class="text-neutral-500">// SQL を準備して、all() / get() / run() で実行する</span>
+<span class="text-sky-300">const</span> selectAll = db.prepare(<span class="text-emerald-300">'SELECT * FROM users'</span>);
+<span class="text-sky-300">const</span> users = selectAll.all();                  <span class="text-neutral-500">// 全件 (配列)</span>
+
+<span class="text-sky-300">const</span> selectOne = db.prepare(<span class="text-emerald-300">'SELECT * FROM users WHERE id = ?'</span>);
+<span class="text-sky-300">const</span> user = selectOne.get(<span class="text-amber-300">1</span>);                  <span class="text-neutral-500">// 1件 (なければ undefined)</span>
+
+<span class="text-sky-300">const</span> insertUser = db.prepare(<span class="text-emerald-300">'INSERT INTO users (name, email) VALUES (?, ?)'</span>);
+<span class="text-sky-300">const</span> result = insertUser.run(<span class="text-emerald-300">'Taro'</span>, <span class="text-emerald-300">'taro@test.com'</span>);   <span class="text-neutral-500">// { changes, lastInsertRowid }</span>
+
+db.close();</code></pre>
+    </section>
+  </main>
+  <script type="module">
+    import { api } from '/js/layout.js';
+
+    // DB に接続できたら Connected を表示
+    const status = document.getElementById('db-status');
+    const dot = document.getElementById('db-dot');
+    const label = document.getElementById('db-label');
+    const detail = document.getElementById('db-detail');
+
+    try {
+      const result = await api('/api/db/status');
+      if (!result.connected) throw new Error(result.errors[0].msg);
+      status.className = 'mt-6 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-1.5 text-sm text-emerald-800';
+      dot.className = 'size-2.5 rounded-full bg-emerald-500';
+      label.textContent = 'Connected';
+      detail.textContent = `SQLite ${result.version} · ${result.file}`;
+    } catch (error) {
+      status.className = 'mt-6 inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-3.5 py-1.5 text-sm text-red-800';
+      dot.className = 'size-2.5 rounded-full bg-red-500';
+      label.textContent = 'Not connected';
+      detail.textContent = error.message;
+    }
+  </script>
+</body>
+</html>

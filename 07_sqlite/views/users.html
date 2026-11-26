@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Users · Node SQLite</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="min-h-screen bg-white text-neutral-900 antialiased">
+  <div id="header"></div>
+  <main class="mx-auto max-w-5xl px-4 py-10">
+    <h1 class="mb-6 text-2xl font-semibold tracking-tight">Users</h1>
+    <section class="mb-8 divide-y divide-neutral-200 rounded-xl border border-neutral-200 text-sm">
+      <div class="flex gap-4 px-4 py-2.5"><span class="w-20 shrink-0 text-neutral-400">Endpoint</span><code id="endpoint" class="font-mono text-neutral-600"></code></div>
+      <div class="flex gap-4 px-4 py-2.5"><span class="w-20 shrink-0 text-neutral-400">SQL</span><pre id="sql" class="overflow-x-auto font-mono text-neutral-600"></pre></div>
+      <div class="flex gap-4 px-4 py-2.5"><span class="w-20 shrink-0 text-neutral-400">Message</span><span id="message" class="font-mono text-neutral-600"></span></div>
+    </section>
+    <div class="overflow-hidden rounded-xl border border-neutral-200">
+      <table class="w-full text-left text-sm">
+        <thead class="border-b border-neutral-200 bg-neutral-50 text-neutral-500">
+          <tr><th class="px-4 py-2.5 font-medium">ID</th><th class="px-4 py-2.5 font-medium">Name</th><th class="px-4 py-2.5 font-medium">Email</th><th class="px-4 py-2.5 font-medium">Joined</th></tr>
+        </thead>
+        <tbody id="user-list" class="divide-y divide-neutral-100"></tbody>
+      </table>
+    </div>
+    <section class="mt-10 rounded-xl bg-neutral-50 px-5 py-4 text-sm leading-relaxed text-neutral-600">
+      <h2 class="mb-2 font-medium text-neutral-900">解説</h2>
+      <ul class="list-disc space-y-1 pl-5">
+        <li>ページを開くと <span class="inline-flex items-center overflow-hidden rounded-md border border-neutral-300 bg-white align-middle font-mono text-sm font-semibold"><span class="bg-emerald-600 px-1.5 py-0.5 text-white">GET</span><span class="px-2 py-0.5 text-neutral-900">/api/users</span></span> を <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">fetch</code> し、返ってきた JSON をテーブルに描画します。</li>
+        <li>ルート → コントローラー → モデルの順に呼ばれ、モデルが <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">prepare()</code> で SQL を準備し、<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">all(limit)</code> で全件を取得します。</li>
+        <li><code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">LIMIT ?</code> の <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">?</code> はプレースホルダです。値は SQL に直接埋め込まず、<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">all(limit)</code> の引数で渡します。</li>
+        <li>上の Endpoint / SQL / Message は、実際に呼び出した API と実行された SQL です。</li>
+        <li>日時は <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">CURRENT_TIMESTAMP</code> で UTC のまま保存され、画面で日本時間に変換して表示しています。</li>
+      </ul>
+      <pre class="mt-4 overflow-x-auto rounded-xl bg-neutral-900 p-4 font-mono text-sm leading-relaxed text-neutral-100"><code><span class="text-neutral-500">// 画面 (views/users.html)</span>
+<span class="text-sky-300">const</span> result = <span class="text-sky-300">await</span> api(<span class="text-emerald-300">'/api/users'</span>);
+
+<span class="text-neutral-500">// routes/routes.js</span>
+router.get(<span class="text-emerald-300">'/api/users'</span>, Api.userList);
+
+<span class="text-neutral-500">// controllers/ApiController.js</span>
+<span class="text-sky-300">export</span> <span class="text-sky-300">const</span> userList = (req, res) =&gt; {
+    <span class="text-sky-300">const</span> result = User.fetchAll(Number(req.query.limit) || <span class="text-amber-300">20</span>);
+    res.json({ users: result.users, sql: result.sql, message: <span class="text-emerald-300">'Listed'</span>, errors: [] });
+};
+
+<span class="text-neutral-500">// models/User.js</span>
+<span class="text-sky-300">export</span> <span class="text-sky-300">const</span> fetchAll = (limit = <span class="text-amber-300">20</span>) =&gt; {
+    <span class="text-sky-300">const</span> sql = <span class="text-emerald-300">"SELECT id, name, email, created_at FROM users ORDER BY id LIMIT ?;"</span>;
+    <span class="text-sky-300">const</span> statement = db.prepare(sql);
+    <span class="text-sky-300">const</span> users = statement.all(limit);
+    <span class="text-sky-300">return</span> { users, sql: format(sql, [limit]) };
+};</code></pre>
+    </section>
+  </main>
+  <script type="module">
+    import { api, showStatus, esc, fmtDate } from '/js/layout.js';
+    const result = await api('/api/users');
+    showStatus({ ...result, endpoint: 'GET /api/users' });
+    document.getElementById('user-list').innerHTML = (result.users ?? []).map((user) => `
+      <tr class="hover:bg-neutral-50">
+        <td class="px-4 py-2.5 text-neutral-400">${user.id}</td>
+        <td class="px-4 py-2.5 font-medium">${esc(user.name)}</td>
+        <td class="px-4 py-2.5 text-neutral-500">${esc(user.email)}</td>
+        <td class="px-4 py-2.5 text-neutral-400">${fmtDate(user.created_at)}</td>
+      </tr>`).join('');
+  </script>
+</body>
+</html>

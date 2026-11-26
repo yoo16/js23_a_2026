@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feeds · Node SQLite</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="min-h-screen bg-white text-neutral-900 antialiased">
+  <div id="header"></div>
+  <main class="mx-auto max-w-5xl px-4 py-10">
+    <h1 class="mb-6 text-2xl font-semibold tracking-tight">Feeds</h1>
+    <section class="mb-8 divide-y divide-neutral-200 rounded-xl border border-neutral-200 text-sm">
+      <div class="flex gap-4 px-4 py-2.5"><span class="w-20 shrink-0 text-neutral-400">Endpoint</span><code id="endpoint" class="font-mono text-neutral-600"></code></div>
+      <div class="flex gap-4 px-4 py-2.5"><span class="w-20 shrink-0 text-neutral-400">SQL</span><pre id="sql" class="overflow-x-auto font-mono text-neutral-600"></pre></div>
+      <div class="flex gap-4 px-4 py-2.5"><span class="w-20 shrink-0 text-neutral-400">Message</span><span id="message" class="font-mono text-neutral-600"></span></div>
+    </section>
+    <form id="post-form" class="mb-3 flex gap-2">
+      <select id="user-select" name="user_id" required class="w-40 shrink-0 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm focus:border-neutral-900 focus:outline-none"></select>
+      <input id="content" name="content" required placeholder="いまどうしてる？" class="min-w-0 flex-1 rounded-lg border border-neutral-200 px-3 py-2 text-sm focus:border-neutral-900 focus:outline-none" />
+      <button class="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-neutral-700">Post</button>
+    </form>
+    <div class="mb-3 flex items-center gap-3 rounded-lg border border-dashed border-red-200 bg-red-50/50 px-3 py-2 text-sm">
+      <code id="injection-content" class="flex-1 select-all overflow-x-auto font-mono text-red-700">x'); DELETE FROM feeds; --</code>
+      <button id="injection-button" class="shrink-0 rounded-md border border-red-200 bg-white px-3 py-1 text-red-600 transition hover:bg-red-50">Post injection</button>
+    </div>
+    <div class="mb-10 flex items-center gap-3 rounded-lg border border-dashed border-neutral-300 px-3 py-2 text-sm">
+      <span class="flex-1 text-neutral-500">2件をまとめて投稿 (トランザクション)</span>
+      <button id="tx-ok" class="shrink-0 rounded-md border border-neutral-200 bg-white px-3 py-1 text-neutral-700 transition hover:border-neutral-900">COMMIT</button>
+      <button id="tx-ng" class="shrink-0 rounded-md border border-neutral-200 bg-white px-3 py-1 text-neutral-700 transition hover:border-neutral-900">ROLLBACK</button>
+    </div>
+    <ul id="feed-list" class="divide-y divide-neutral-100"></ul>
+    <section class="mt-10 rounded-xl bg-neutral-50 px-5 py-4 text-sm leading-relaxed text-neutral-600">
+      <h2 class="mb-2 font-medium text-neutral-900">解説</h2>
+      <ul class="list-disc space-y-1 pl-5">
+        <li><b>一覧</b>: <span class="inline-flex items-center overflow-hidden rounded-md border border-neutral-300 bg-white align-middle font-mono text-sm font-semibold"><span class="bg-emerald-600 px-1.5 py-0.5 text-white">GET</span><span class="px-2 py-0.5 text-neutral-900">/api/feeds</span></span>。<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">JOIN</code> で投稿者名を結合し、<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">ORDER BY created_at DESC</code> で新しい順に <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">all()</code> で取得します。</li>
+        <li><b>Post</b>: <span class="inline-flex items-center overflow-hidden rounded-md border border-neutral-300 bg-white align-middle font-mono text-sm font-semibold"><span class="bg-orange-600 px-1.5 py-0.5 text-white">POST</span><span class="px-2 py-0.5 text-neutral-900">/api/feeds</span></span>。<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">INSERT ... VALUES (?, ?)</code> を <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">run()</code> で実行し、戻り値の <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">lastInsertRowid</code> が追加した行の ID です。</li>
+        <li>存在しない <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">user_id</code> を指定すると、<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">PRAGMA foreign_keys = ON</code> により <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">FOREIGN KEY constraint failed</code> のエラーになります。</li>
+        <li><b>Edit</b>: <span class="inline-flex items-center overflow-hidden rounded-md border border-neutral-300 bg-white align-middle font-mono text-sm font-semibold"><span class="bg-orange-600 px-1.5 py-0.5 text-white">POST</span><span class="px-2 py-0.5 text-neutral-900">/api/feeds/:id/update</span></span>。<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">UPDATE feeds SET content = ? WHERE id = ?</code> を <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">run()</code> で実行します。<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">WHERE</code> を付け忘れると全件が更新されます。</li>
+        <li><b>Delete</b>: <span class="inline-flex items-center overflow-hidden rounded-md border border-neutral-300 bg-white align-middle font-mono text-sm font-semibold"><span class="bg-orange-600 px-1.5 py-0.5 text-white">POST</span><span class="px-2 py-0.5 text-neutral-900">/api/feeds/:id/destroy</span></span>。<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">DELETE ... WHERE id = ?</code> を <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">run()</code> で実行し、削除件数が <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">changes</code> に入ります。</li>
+        <li><b>COMMIT / ROLLBACK</b>: 2件の <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">INSERT</code> を <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">BEGIN</code> ～ <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">COMMIT</code> でまとめます。ROLLBACK のボタンは2件目の前にわざと失敗させ、1件目も取り消されることを確認できます。</li>
+        <li><b class="text-red-600">Post injection</b>: 入力を文字列連結して <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">exec()</code> に渡すデモです。<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">exec()</code> は複数の SQL を実行できるため、<b>feeds が全件削除</b>されます。値は必ず <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">?</code> で渡しましょう。</li>
+      </ul>
+      <pre class="mt-4 overflow-x-auto rounded-xl bg-neutral-900 p-4 font-mono text-sm leading-relaxed text-neutral-100"><code><span class="text-neutral-500">// models/Feed.js: 一覧 (JOIN + 新しい順)</span>
+<span class="text-sky-300">export</span> <span class="text-sky-300">const</span> fetchAll = (limit = <span class="text-amber-300">20</span>) =&gt; {
+    <span class="text-sky-300">const</span> sql = <span class="text-emerald-300">`SELECT feeds.id, feeds.user_id, feeds.content, feeds.created_at,
+       users.name AS user_name
+FROM feeds
+JOIN users ON feeds.user_id = users.id
+ORDER BY feeds.created_at DESC, feeds.id DESC
+LIMIT ?;`</span>;
+    <span class="text-sky-300">const</span> statement = db.prepare(sql);
+    <span class="text-sky-300">const</span> feeds = statement.all(limit);
+    <span class="text-sky-300">return</span> { feeds, sql: format(sql, [limit]) };
+};
+
+<span class="text-neutral-500">// models/Feed.js: 追加</span>
+<span class="text-sky-300">export</span> <span class="text-sky-300">const</span> insert = ({ user_id, content }) =&gt; {
+    <span class="text-sky-300">const</span> sql = <span class="text-emerald-300">"INSERT INTO feeds (user_id, content) VALUES (?, ?);"</span>;
+    <span class="text-sky-300">try</span> {
+        <span class="text-sky-300">const</span> statement = db.prepare(sql);
+        <span class="text-sky-300">const</span> result = statement.run(Number(user_id), content);
+        <span class="text-sky-300">const</span> id = Number(result.lastInsertRowid);
+        <span class="text-sky-300">return</span> { id, errors: [] };
+    } <span class="text-sky-300">catch</span> (error) {
+        <span class="text-sky-300">return</span> { errors: [{ msg: error.message }] };   <span class="text-neutral-500">// 外部キー違反など</span>
+    }
+};
+
+<span class="text-neutral-500">// models/Feed.js: 更新 (WHERE を忘れない)</span>
+<span class="text-sky-300">export</span> <span class="text-sky-300">const</span> update = (id, content) =&gt; {
+    <span class="text-sky-300">const</span> sql = <span class="text-emerald-300">"UPDATE feeds SET content = ? WHERE id = ?;"</span>;
+    <span class="text-sky-300">const</span> statement = db.prepare(sql);
+    <span class="text-sky-300">const</span> result = statement.run(content, Number(id));
+    <span class="text-sky-300">const</span> errors = result.changes ? [] : [{ msg: <span class="text-emerald-300">'Feed not found'</span> }];
+    <span class="text-sky-300">return</span> { id: Number(id), changes: result.changes, errors };
+};
+
+<span class="text-neutral-500">// models/Feed.js: 削除</span>
+<span class="text-sky-300">export</span> <span class="text-sky-300">const</span> destroy = (id) =&gt; {
+    <span class="text-sky-300">const</span> sql = <span class="text-emerald-300">"DELETE FROM feeds WHERE id = ?;"</span>;
+    <span class="text-sky-300">const</span> statement = db.prepare(sql);
+    <span class="text-sky-300">const</span> result = statement.run(Number(id));
+    <span class="text-sky-300">return</span> { id, changes: result.changes, errors: [] };
+};
+
+<span class="text-neutral-500">// models/Feed.js: トランザクション (BEGIN → 複数の SQL → COMMIT / 失敗時は ROLLBACK)</span>
+<span class="text-sky-300">export</span> <span class="text-sky-300">const</span> insertTwice = ({ user_id, fail = false }) =&gt; {
+    <span class="text-sky-300">const</span> sql = <span class="text-emerald-300">"INSERT INTO feeds (user_id, content) VALUES (?, ?);"</span>;
+    <span class="text-sky-300">const</span> statement = db.prepare(sql);
+    db.exec(<span class="text-emerald-300">'BEGIN'</span>);
+    <span class="text-sky-300">try</span> {
+        statement.run(Number(user_id), <span class="text-emerald-300">'トランザクション1'</span>);
+        if (fail) throw <span class="text-sky-300">new</span> Error(<span class="text-emerald-300">'わざと失敗させました'</span>);
+        statement.run(Number(user_id), <span class="text-emerald-300">'トランザクション2'</span>);
+        db.exec(<span class="text-emerald-300">'COMMIT'</span>);
+        <span class="text-sky-300">return</span> { errors: [] };
+    } <span class="text-sky-300">catch</span> (error) {
+        db.exec(<span class="text-emerald-300">'ROLLBACK'</span>);   <span class="text-neutral-500">// 1件目の INSERT も取り消される</span>
+        <span class="text-sky-300">return</span> { errors: [{ msg: error.message }] };
+    }
+};</code></pre>
+      <pre class="mt-4 overflow-x-auto rounded-xl bg-neutral-900 p-4 font-mono text-sm leading-relaxed text-neutral-100"><code><span class="text-neutral-500">// ⚠️ 危険: 入力を文字列連結して exec() に渡す</span>
+<span class="text-sky-300">const</span> sql = <span class="text-emerald-300">`INSERT INTO feeds (user_id, content) VALUES (${user_id}, '${content}');`</span>;
+db.exec(sql);   <span class="text-neutral-500">// exec() は複数の SQL を実行できてしまう</span>
+
+<span class="text-neutral-500">// content が  x'); DELETE FROM feeds; --  のとき、実行される SQL は</span>
+<span class="text-neutral-500">// INSERT INTO feeds (user_id, content) VALUES (1, 'x'); DELETE FROM feeds; --');</span>
+
+<span class="text-neutral-500">// ✅ 安全: プレースホルダで「値」として渡す</span>
+<span class="text-sky-300">const</span> safe = <span class="text-emerald-300">"INSERT INTO feeds (user_id, content) VALUES (?, ?);"</span>;
+<span class="text-sky-300">const</span> statement = db.prepare(safe);
+statement.run(user_id, content);</code></pre>
+    </section>
+  </main>
+  <script type="module">
+    import { api, postJson, showStatus, esc, fmtDate, initials } from '/js/layout.js';
+
+    const list = document.getElementById('feed-list');
+    let editingId = null;   // 編集中の feed の ID
+
+    async function load() {
+      const result = await api('/api/feeds');
+      showStatus({ ...result, endpoint: 'GET /api/feeds' });
+      list.innerHTML = (result.feeds ?? []).length ? result.feeds.map((feed) => `
+        <li class="flex gap-3 py-4">
+          <div class="flex size-9 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-xs font-medium text-neutral-600">${esc(initials(feed.user_name))}</div>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-baseline gap-2 text-sm"><span class="font-medium">${esc(feed.user_name)}</span><span class="text-neutral-400">${fmtDate(feed.created_at)}</span></div>
+            ${feed.id === editingId
+              ? `<input id="edit-input" value="${esc(feed.content)}" class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-1.5 text-sm focus:border-neutral-900 focus:outline-none" />`
+              : `<p class="mt-0.5 break-words text-neutral-700">${esc(feed.content)}</p>`}
+          </div>
+          <div class="flex gap-3 self-start text-sm">
+            ${feed.id === editingId
+              ? `<button data-id="${feed.id}" class="save text-neutral-900">Save</button><button class="cancel text-neutral-400">Cancel</button>`
+              : `<button data-id="${feed.id}" class="edit text-neutral-300 transition hover:text-neutral-900">Edit</button><button data-id="${feed.id}" class="delete text-neutral-300 transition hover:text-red-500">Delete</button>`}
+          </div>
+        </li>`).join('') : '<li class="py-10 text-center text-sm text-neutral-400">No feeds yet.</li>';
+    }
+
+    async function loadUsers() {
+      const result = await api('/api/users?limit=100');
+      document.getElementById('user-select').innerHTML = (result.users ?? []).map((user) => `<option value="${user.id}">${esc(user.name)}</option>`).join('');
+    }
+
+    document.getElementById('post-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const body = Object.fromEntries(new FormData(event.target));
+      const result = await postJson('/api/feeds', body);
+      showStatus({ ...result, endpoint: 'POST /api/feeds' });
+      if (!result.errors.length) { event.target.content.value = ''; await load(); showStatus({ ...result, endpoint: 'POST /api/feeds' }); }
+    });
+
+    document.getElementById('injection-button').addEventListener('click', async () => {
+      const result = await postJson('/api/feeds/injection', {
+        user_id: document.getElementById('user-select').value,
+        content: document.getElementById('injection-content').textContent,
+      });
+      await load();
+      showStatus({ ...result, endpoint: 'POST /api/feeds/injection' });
+    });
+
+    for (const [buttonId, fail] of [['tx-ok', false], ['tx-ng', true]]) {
+      document.getElementById(buttonId).addEventListener('click', async () => {
+        const result = await postJson('/api/feeds/transaction', { user_id: document.getElementById('user-select').value, fail });
+        await load();
+        showStatus({ ...result, endpoint: 'POST /api/feeds/transaction' });
+      });
+    }
+
+    list.addEventListener('click', async (event) => {
+      const id = event.target.dataset.id;
+      const classList = event.target.classList;
+      if (classList.contains('edit')) {
+        editingId = Number(id);
+        await load();
+        document.getElementById('edit-input').focus();
+        return;
+      }
+      if (classList.contains('cancel')) { editingId = null; await load(); return; }
+      if (classList.contains('save')) {
+        const result = await postJson(`/api/feeds/${id}/update`, { content: document.getElementById('edit-input').value });
+        if (!result.errors.length) editingId = null;
+        await load();
+        showStatus({ ...result, endpoint: `POST /api/feeds/${id}/update` });
+        return;
+      }
+      if (!classList.contains('delete')) return;
+      const result = await api(`/api/feeds/${id}/destroy`, { method: 'POST' });
+      await load();
+      showStatus({ ...result, endpoint: `POST /api/feeds/${id}/destroy` });
+    });
+
+    await loadUsers();
+    await load();
+  </script>
+</body>
+</html>

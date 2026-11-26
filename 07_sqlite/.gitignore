@@ -1,0 +1,9 @@
+.env
+database/*.db
+database/*.db-*
+node_modules
+.DS_Store
+.idea
+.vscode/*
+!.vscode/extensions.json
+*.log

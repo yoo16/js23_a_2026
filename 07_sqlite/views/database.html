@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Database · Node SQLite</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="min-h-screen bg-white text-neutral-900 antialiased">
+  <div id="header"></div>
+  <main class="mx-auto max-w-5xl px-4 py-10">
+    <h1 class="mb-6 text-2xl font-semibold tracking-tight">Database</h1>
+    <section class="mb-8 divide-y divide-neutral-200 rounded-xl border border-neutral-200 text-sm">
+      <div class="flex gap-4 px-4 py-2.5"><span class="w-20 shrink-0 text-neutral-400">Endpoint</span><code id="endpoint" class="font-mono text-neutral-600"></code></div>
+      <div class="flex gap-4 px-4 py-2.5"><span class="w-20 shrink-0 text-neutral-400">SQL</span><pre id="sql" class="overflow-x-auto font-mono text-neutral-600"></pre></div>
+      <div class="flex gap-4 px-4 py-2.5"><span class="w-20 shrink-0 text-neutral-400">Message</span><span id="message" class="font-mono text-neutral-600"></span></div>
+    </section>
+    <div class="mb-10 grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <button data-action="create" data-url="/api/db/create" class="action rounded-xl border border-neutral-200 p-4 text-left transition hover:border-neutral-900">
+        <span class="block font-medium">テーブル作成</span>
+        <span class="mt-1 block text-sm text-neutral-500">schema.sql を実行 (CREATE TABLE)</span>
+      </button>
+      <button data-action="seed" data-url="/api/db/seed" class="action rounded-xl border border-neutral-200 p-4 text-left transition hover:border-neutral-900">
+        <span class="block font-medium">テストデータ投入</span>
+        <span class="mt-1 block text-sm text-neutral-500">users 10件 / feeds 30件を追加</span>
+      </button>
+      <button data-action="truncate" data-url="/api/db/truncate" data-confirm="users と feeds のデータをすべて削除します。よろしいですか?" class="action rounded-xl border border-red-200 p-4 text-left transition hover:border-red-500">
+        <span class="block font-medium text-red-600">全データ削除</span>
+        <span class="mt-1 block text-sm text-neutral-500">DELETE (テーブルは残る)</span>
+      </button>
+      <button data-action="drop" data-url="/api/db/drop" data-confirm="テーブル (users, feeds) を削除します。よろしいですか?" class="action rounded-xl border border-red-200 p-4 text-left transition hover:border-red-500">
+        <span class="block font-medium text-red-600">テーブル削除</span>
+        <span class="mt-1 block text-sm text-neutral-500">DROP TABLE (「テーブル作成」で戻せる)</span>
+      </button>
+    </div>
+    <h2 class="mb-3 text-sm font-medium text-neutral-400">Tables</h2>
+    <div id="tables" class="grid gap-4 md:grid-cols-2"></div>
+    <section class="mt-10 rounded-xl bg-neutral-50 px-5 py-4 text-sm leading-relaxed text-neutral-600">
+      <h2 class="mb-2 font-medium text-neutral-900">解説</h2>
+      <ul class="list-disc space-y-1 pl-5">
+        <li><b>テーブル作成</b>: <span class="inline-flex items-center overflow-hidden rounded-md border border-neutral-300 bg-white align-middle font-mono text-sm font-semibold"><span class="bg-orange-600 px-1.5 py-0.5 text-white">POST</span><span class="px-2 py-0.5 text-neutral-900">/api/db/create</span></span>。<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">migrate()</code> が <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">schema.sql</code> を読み込み、<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">exec()</code> で実行します。<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">IF NOT EXISTS</code> なので、何度押してもエラーになりません。</li>
+        <li><b>テストデータ投入</b>: <span class="inline-flex items-center overflow-hidden rounded-md border border-neutral-300 bg-white align-middle font-mono text-sm font-semibold"><span class="bg-orange-600 px-1.5 py-0.5 text-white">POST</span><span class="px-2 py-0.5 text-neutral-900">/api/db/seed</span></span>。<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">faker</code> で作ったダミーデータを、<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">BEGIN</code> ～ <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">COMMIT</code> のトランザクションでまとめて <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">INSERT</code> します。<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">email</code> は <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">UNIQUE</code> なので、番号は既存の件数から続けて採番しています。</li>
+        <li><b>全データ削除</b>: <span class="inline-flex items-center overflow-hidden rounded-md border border-neutral-300 bg-white align-middle font-mono text-sm font-semibold"><span class="bg-orange-600 px-1.5 py-0.5 text-white">POST</span><span class="px-2 py-0.5 text-neutral-900">/api/db/truncate</span></span>。<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">DELETE</code> でデータだけを消し、<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">sqlite_sequence</code> も消して ID の採番を 1 に戻します。テーブルは残ります。</li>
+        <li><b>テーブル削除</b>: <span class="inline-flex items-center overflow-hidden rounded-md border border-neutral-300 bg-white align-middle font-mono text-sm font-semibold"><span class="bg-orange-600 px-1.5 py-0.5 text-white">POST</span><span class="px-2 py-0.5 text-neutral-900">/api/db/drop</span></span>。<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">DROP TABLE</code> でテーブルごと消します。<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">feeds</code> は <code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">users</code> を参照しているため、<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">feeds</code> を先に削除します。</li>
+        <li><b>Tables</b>: <span class="inline-flex items-center overflow-hidden rounded-md border border-neutral-300 bg-white align-middle font-mono text-sm font-semibold"><span class="bg-emerald-600 px-1.5 py-0.5 text-white">GET</span><span class="px-2 py-0.5 text-neutral-900">/api/db/tables</span></span>。<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">sqlite_master</code> からテーブル名を取得し、<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">PRAGMA table_info()</code> でカラム、<code class="rounded border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-sm font-semibold text-sky-800">COUNT(*)</code> で件数を調べています。</li>
+      </ul>
+      <pre class="mt-4 overflow-x-auto rounded-xl bg-neutral-900 p-4 font-mono text-sm leading-relaxed text-neutral-100"><code><span class="text-neutral-500">// models/Db.js: テーブル作成 (schema.sql を実行)</span>
+<span class="text-sky-300">export</span> <span class="text-sky-300">const</span> create = () =&gt; {
+    <span class="text-sky-300">const</span> schema = path.resolve(<span class="text-emerald-300">'database/schema.sql'</span>);
+    <span class="text-sky-300">const</span> text = fs.readFileSync(schema, <span class="text-emerald-300">'utf-8'</span>);
+    <span class="text-sky-300">const</span> sql = text.trim();
+    migrate();   <span class="text-neutral-500">// lib/db.js: db.exec(schema.sql の中身)</span>
+    <span class="text-sky-300">return</span> { errors: [], sql };
+};
+
+<span class="text-neutral-500">// models/Db.js: テーブル一覧</span>
+<span class="text-sky-300">export</span> <span class="text-sky-300">const</span> tables = () =&gt; {
+    <span class="text-sky-300">const</span> sql = <span class="text-emerald-300">"SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name"</span>;
+    <span class="text-sky-300">const</span> statement = db.prepare(sql);
+    <span class="text-sky-300">const</span> rows = statement.all();
+    <span class="text-neutral-500">// 各テーブルについて、PRAGMA table_info() でカラム、COUNT(*) で件数を取得</span>
+    <span class="text-sky-300">return</span> { tables: rows, errors: [] };
+};
+
+<span class="text-neutral-500">// models/Db.js: 全データ削除 (SQLite に TRUNCATE はない)</span>
+<span class="text-sky-300">export</span> <span class="text-sky-300">const</span> truncate = () =&gt; {
+    <span class="text-sky-300">const</span> sql = "DELETE FROM feeds;
+DELETE FROM users;
+DELETE FROM sqlite_sequence WHERE name IN (<span class="text-emerald-300">'feeds'</span>, <span class="text-emerald-300">'users'</span>);";
+    db.exec(sql);
+    <span class="text-sky-300">return</span> { errors: [], sql };
+};</code></pre>
+    </section>
+  </main>
+  <script type="module">
+    import { api, showStatus, esc } from '/js/layout.js';
+
+    const tablesElement = document.getElementById('tables');
+
+    // テーブル一覧 (名前・件数・カラム) を表示
+    async function loadTables() {
+      const result = await api('/api/db/tables');
+      showStatus({ ...result, endpoint: 'GET /api/db/tables' });
+      tablesElement.innerHTML = result.tables.length ? result.tables.map((table) => `
+        <div class="overflow-hidden rounded-xl border border-neutral-200">
+          <div class="flex items-baseline justify-between border-b border-neutral-200 bg-neutral-50 px-4 py-2.5">
+            <span class="font-mono font-medium">${esc(table.name)}</span>
+            <span class="text-sm text-neutral-500">${table.count} rows</span>
+          </div>
+          <table class="w-full text-left text-sm">
+            <tbody class="divide-y divide-neutral-100">
+              ${table.columns.map((column) => `
+                <tr>
+                  <td class="px-4 py-2 font-mono">${esc(column.name)}</td>
+                  <td class="px-4 py-2 font-mono text-neutral-400">${esc(column.type)}</td>
+                  <td class="px-4 py-2 text-xs text-neutral-500">${column.pk ? 'PRIMARY KEY' : ''}${column.notnull ? ' NOT NULL' : ''}</td>
+                </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>`).join('') : '<p class="py-10 text-center text-sm text-neutral-400 md:col-span-2">テーブルがありません。「テーブル作成」を押してください。</p>';
+    }
+
+    // ボタンの操作を実行して、テーブル一覧を更新
+    document.querySelectorAll('.action').forEach((button) => button.addEventListener('click', async () => {
+      if (button.dataset.confirm && !confirm(button.dataset.confirm)) return;
+      const result = await api(button.dataset.url, { method: 'POST' });
+      await loadTables();
+      showStatus({ ...result, endpoint: `POST ${button.dataset.url}` });
+    }));
+
+    await loadTables();
+  </script>
+</body>
+</html>
