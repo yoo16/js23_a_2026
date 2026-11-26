@@ -15,7 +15,7 @@ fs.mkdirSync(path.dirname(dbFile), { recursive: true });
 export const db = new DatabaseSync(dbFile);
 
 // TODO: SQL 実行(外部キー制約を有効化): exec()
-// db.exec('PRAGMA foreign_keys = ON;');
+db.exec('PRAGMA foreign_keys = ON;');
 
 // 画面表示用: ? をパラメータで置換した SQL 文字列
 export const format = (sql, params = []) => {
